@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Marks Chart App</title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background: linear-gradient(to right, #ffdde1, #ee9ca7);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .card {
+      border-radius: 20px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+      background-color: #ffffffcc;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-custom {
+      background-color: #d63384;
+      border: none;
+      color: white;
+    }
+
+    .btn-custom:hover {
+      background-color: #ad2268;
+    }
+
+    .form-control:focus {
+      border-color: #d63384;
+      box-shadow: 0 0 0 0.25rem rgba(214, 51, 132, 0.25);
+    }
+
+    canvas {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 15px;
+    }
+
+    .icon-input {
+      position: relative;
+    }
+
+    .icon-input i {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      color: #d63384;
+    }
+
+    .icon-input input {
+      padding-left: 35px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card-title i {
+      color: #d63384;
+    }
+
+    .text-link {
+      color: #d63384;
+    }
+
+    .text-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Welcome Page Specific Styling */
+    #welcomePage h1 {
+      font-size: 3rem;
+      color: #d63384;
+      font-weight: bold;
+    }
+
+    #welcomePage p {
+      font-size: 1.2rem;
+      color: #555;
+    }
+
+    #welcomePage .btn-custom {
+      font-size: 1.2rem;
+      padding: 10px 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Welcome Page -->
+  <div id="welcomePage" class="page active">
+    <div class="text-center">
+      <h1>Welcome to the Student Marks Chart App</h1>
+      <p>Sign up to track your marks and visualize them in a beautiful chart!</p>
+      <button class="btn btn-custom mt-4" onclick="goToSignup()">Get Started</button>
+    </div>
+  </div>
+
+  <!-- Signup Page -->
+  <div id="signupPage" class="page">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="card p-4">
+            <h3 class="card-title text-center mb-3"><i class="bi bi-person-plus-fill"></i> Sign Up</h3>
+            <div class="icon-input mb-3">
+              <i class="bi bi-person"></i>
+              <input type="text" id="signupUsername" class="form-control" placeholder="Choose a Username" />
+            </div>
+            <div class="icon-input mb-3">
+              <i class="bi bi-lock"></i>
+              <input type="password" id="signupPassword" class="form-control" placeholder="Choose a Password" />
+            </div>
+            <button onclick="signup()" class="btn btn-custom w-100">Create Account</button>
+            <p class="text-center mt-3">Already have an account? <a href="#" class="text-link" onclick="switchToLogin()">Login</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Page -->
+  <div id="loginPage" class="page">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="card p-4">
+            <h3 class="card-title text-center mb-3"><i class="bi bi-box-arrow-in-right"></i> Login</h3>
+            <div class="icon-input mb-3">
+              <i class="bi bi-person"></i>
+              <input type="text" id="loginUsername" class="form-control" placeholder="Enter Username" />
+            </div>
+            <div class="icon-input mb-3">
+              <i class="bi bi-lock"></i>
+              <input type="password" id="loginPassword" class="form-control" placeholder="Enter Password" />
+            </div>
+            <button onclick="login()" class="btn btn-custom w-100">Login</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Page -->
+  <div id="chartPage" class="page">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+          <div class="card p-4">
+            <h4 class="card-title text-center mb-3"><i class="bi bi-bar-chart-line-fill"></i> Enter Your Marks</h4>
+            <form id="marksForm">
+              <input type="hidden" id="studentName" />
+              <div class="row mb-3">
+                <div class="col">
+                  <input type="number" name="math" placeholder="Math Marks" class="form-control" required />
+                </div>
+                <div class="col">
+                  <input type="number" name="english" placeholder="English Marks" class="form-control" required />
+                </div>
+                <div class="col">
+                  <input type="number" name="science" placeholder="Science Marks" class="form-control" required />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-custom w-100">Generate Chart</button>
+            </form>
+            <canvas id="barChart" class="mt-4"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Logic -->
+  <script>
+    let barChart;
+
+    function goToSignup() {
+      document.getElementById("welcomePage").classList.remove("active");
+      document.getElementById("signupPage").classList.add("active");
+    }
+
+    function switchToLogin() {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById("loginPage").classList.add("active");
+    }
+
+    function switchToChartPage() {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById("chartPage").classList.add("active");
+    }
+
+    function signup() {
+      const username = document.getElementById("signupUsername").value.trim();
+      const password = document.getElementById("signupPassword").value.trim();
+
+      if (!username || !password) {
+        alert("Please enter both username and password.");
+        return;
+      }
+
+      localStorage.setItem("student_username", username);
+      localStorage.setItem("student_password", password);
+      alert("Account created! Now login.");
+      switchToLogin();
+    }
+
+    function login() {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      const storedUser = localStorage.getItem("student_username");
+      const storedPass = localStorage.getItem("student_password");
+
+      if (username === storedUser && password === storedPass) {
+        document.getElementById("studentName").value = username;
+        switchToChartPage();
+      } else {
+        alert("Invalid login. Please check credentials or sign up first.");
+      }
+    }
+
+    document.getElementById("marksForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("studentName").value;
+      const math = parseInt(e.target.math.value);
+      const english = parseInt(e.target.english.value);
+      const science = parseInt(e.target.science.value);
+      const avg = ((math + english + science) / 3).toFixed(2);
+
+      const ctx = document.getElementById("barChart").getContext("2d");
+      if (barChart) barChart.destroy();
+
+      barChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Math", "English", "Science", "Average"],
+          datasets: [{
+            label: `${name}'s Marks`,
+            data: [math, english, science, avg],
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.7)",
+              "rgba(54, 162, 235, 0.7)",
+              "rgba(255, 206, 86, 0.7)",
+              "rgba(75, 192, 192, 0.7)"
+            ]
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              suggestedMax: 100
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
